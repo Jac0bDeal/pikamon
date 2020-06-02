@@ -7,6 +7,8 @@ import (
 	"syscall"
 
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/spawn"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -25,8 +27,14 @@ func New(cfg *Config) (*Bot, error) {
 		return nil, err
 	}
 
+	listener, err := spawn.NewHandler(cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
+	if err != nil {
+		return nil, err
+	}
+
 	// register discord handlers
 	discord.AddHandler(commands.Handle)
+	discord.AddHandler(listener.Handle)
 
 	return &Bot{
 		discord: discord,

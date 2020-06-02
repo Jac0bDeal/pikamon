@@ -21,7 +21,7 @@ the `--token` or `-t` flag:
 Alternatively, if the token is exported via the appropriate env variable, 
 the `--token` flag is not needed:
 ```shell script
-export PIKAMON_TOKEN <TOKEN_HERE>
+export PIKAMON_TOKEN=<TOKEN_HERE>
 ./bin/pikamon
 ```
 To acquire the dev bot token, reach out to a project admin. If a standalone bot

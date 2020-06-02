@@ -11,7 +11,7 @@ type spawner interface {
 	spawn(*discordgo.Session, *discordgo.MessageCreate) bool
 }
 
-// Handler listens to non-Pikamon messages in a channel, calls performs the
+// Handler listens to non-Pikamon messages in a channel and  performs the
 // spawn operations.
 type Handler struct {
 	spawners []spawner

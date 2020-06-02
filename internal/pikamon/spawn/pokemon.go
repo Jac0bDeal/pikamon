@@ -34,18 +34,19 @@ func newPokemonSpawner(chance float64, debounceWindow time.Duration) (*pokemonSp
 }
 
 func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate) bool {
-	// check if channel id is still in cache
+	// check if channel id is still in cache, if it is
+	// we are still in the debounce window
 	_, exists := p.channelCache.Get(m.ChannelID)
 	if exists {
 		return false
 	}
 
-	// randomly determine if a pokemonSpawner is spawned
+	// randomly determine if a pokemon is spawned
 	if rand.Float64() > p.chance {
 		return false
 	}
 
-	// spawn a pokemonSpawner!
+	// spawn a pokemon!
 	pokemonID := rand.Intn(890) + 1
 	msg := discordgo.MessageEmbed{
 		Title:       "‌‌A wild pokémon has appeared!",

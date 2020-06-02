@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/appearance"
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/spawn"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/pkg/errors"
@@ -19,7 +19,7 @@ type Bot struct {
 	discord *discordgo.Session
 }
 
-// NewListener configures a Bot from the passed config, and returns it.
+// New configures a Bot from the passed config, and returns it.
 func New(cfg *Config) (*Bot, error) {
 	authStr := fmt.Sprintf("Bot %s", cfg.Discord.Token)
 	discord, err := discordgo.New(authStr)
@@ -27,7 +27,7 @@ func New(cfg *Config) (*Bot, error) {
 		return nil, err
 	}
 
-	listener, err := appearance.NewListener(cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
+	listener, err := spawn.NewHandler(cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
 	if err != nil {
 		return nil, err
 	}

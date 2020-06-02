@@ -1,3 +1,6 @@
 pikamon:
   logging:
     level: debug
+  bot:
+    debounce-window: 10s
+    spawn-chance: 0.10

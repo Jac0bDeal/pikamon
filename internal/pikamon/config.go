@@ -1,6 +1,8 @@
 package pikamon
 
 import (
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -13,6 +15,10 @@ type Config struct {
 	}
 	Logging struct {
 		Level string
+	}
+	Bot struct {
+		DebounceWindow time.Duration
+		SpawnChance    float64
 	}
 }
 
@@ -33,6 +39,8 @@ func GetConfig() (*Config, error) {
 		return nil, errors.Wrap(err, "failed to read config file")
 	}
 	cfg.Logging.Level = viper.GetString("pikamon.logging.level")
+	cfg.Bot.DebounceWindow = viper.GetDuration("pikamon.bot.debounce-window")
+	cfg.Bot.SpawnChance = viper.GetFloat64("pikamon.bot.spawn-chance")
 
 	// define flags
 	pflag.StringVarP(&cfg.Discord.Token, "token", "t", "", "Bot Token")

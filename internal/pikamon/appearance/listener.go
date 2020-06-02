@@ -60,7 +60,7 @@ func (l *Listener) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	l.channelCache.SetWithTTL(m.ChannelID, struct{}{}, 1, l.debounceWindow)
 
 	// spawn a pokemon!
-	pokemonID := rand.Intn(964) + 1
+	pokemonID := rand.Intn(890) + 1
 	msg := discordgo.MessageEmbed{
 		Title:       "‌‌A wild pokémon has appeared!",
 		Description: "Guess the pokémon аnd type `p!ka catch <pokémon> with <ball>` to cаtch it!",

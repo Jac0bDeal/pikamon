@@ -7,13 +7,12 @@ A Pokemon Discord bot inspired by the late Pokecord.
 ## Installation
 Pikamon is built on Go 1.14+, please make sure this version is used to build and test the application.
 
-Build the Pikamon binary using the make target `build` (`rebuild` if you already have built it before):
+Build the Pikamon bot binary using the make target `bot`:
 ```shell script
-make build
-make rebuild
+make bot
 ```
 
-Once it is built, then the bot is can be run at minimum with the `--token` or `-t` flag:
+Once it is built, then the bot can be run at minimum with the `--token` or `-t` flag:
 ```shell script
 ./bin/pikamon --token <TOKEN_HERE>
 ./bin/pikamon -t <TOKEN_HERE>

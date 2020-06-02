@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/dgraph-io/ristretto"
 	"github.com/pkg/errors"
 )
 
@@ -15,9 +14,7 @@ type spawner interface {
 // Handler listens to non-Pikamon messages in a channel, calls performs the
 // spawn operations.
 type Handler struct {
-	channelCache   *ristretto.Cache
-	debounceWindow time.Duration
-	spawners       []spawner
+	spawners []spawner
 }
 
 // NewHandler constructs and returns a new Handler that spawns things in channels.

@@ -1,6 +1,7 @@
 package appearance
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -59,7 +60,16 @@ func (l *Listener) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	l.channelCache.SetWithTTL(m.ChannelID, struct{}{}, 1, l.debounceWindow)
 
 	// spawn a pokemon!
-	if _, err := s.ChannelMessageSend(m.ChannelID, "Egads! A wild Mewtwo hath appeared!"); err != nil {
+	pokemonID := rand.Intn(964) + 1
+	msg := discordgo.MessageEmbed{
+		Title:       "‌‌A wild pokémon has appeared!",
+		Description: "Guess the pokémon аnd type `p!ka catch <pokémon> with <ball>` to cаtch it!",
+		Color:       0x008080,
+		Image: &discordgo.MessageEmbedImage{
+			URL: fmt.Sprintf("https://pokeres.bastionbot.org/images/pokemon/%d.png", pokemonID),
+		},
+	}
+	if _, err := s.ChannelMessageSendEmbed(m.ChannelID, &msg); err != nil {
 		log.Error(err)
 	}
 }

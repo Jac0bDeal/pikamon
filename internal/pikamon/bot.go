@@ -27,14 +27,22 @@ func New(cfg *Config) (*Bot, error) {
 		return nil, err
 	}
 
+	// TODO - We need to add the message ID of the spawned pokemon to a struct or other object to reference later
+	// If we know the message ID we can use the following to get the posted pokemon so we know what we are catching - https://discord.com/developers/docs/resources/channel#get-channel-message
+	// May also need to use the message metadata to determine if pokemon is still there unless that is what the DebounceWindow is
+	// we likely also need a way to determine when to clean up the pokemon that was last spawned. Perhaps that is its own issue.
+
 	listener, err := spawn.NewHandler(cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
 	if err != nil {
 		return nil, err
 	}
 
+	// TODO - Create catcher handler
+
 	// register discord handlers
 	discord.AddHandler(commands.Handle)
 	discord.AddHandler(listener.Handle)
+	// TODO - Add handler for catcher
 
 	return &Bot{
 		discord: discord,

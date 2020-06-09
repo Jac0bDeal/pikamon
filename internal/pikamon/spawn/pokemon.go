@@ -61,6 +61,8 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 		return false
 	}
 
+	// TODO - add pokemon to either channel cache or object.
+
 	// add channel id to cache, set to expire after the debounce window
 	p.channelCache.SetWithTTL(m.ChannelID, struct{}{}, 1, p.debounceWindow)
 

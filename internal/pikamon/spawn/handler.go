@@ -1,10 +1,15 @@
 package spawn
 
 import (
-	"time"
-
 	"github.com/bwmarrin/discordgo"
 	"github.com/pkg/errors"
+	"strings"
+	"time"
+)
+
+// TODO - make global
+const (
+	CommandKeyword = "p!ka"
 )
 
 type spawner interface {
@@ -35,6 +40,12 @@ func NewHandler(pokemonSpawnChance float64, debounceWindow time.Duration) (*Hand
 func (h *Handler) Handle(sess *discordgo.Session, m *discordgo.MessageCreate) {
 	// ignore all messages created by the bot itself
 	if m.Author.ID == sess.State.User.ID {
+		return
+	}
+
+	// ignore all messages prefixed with bot command keyword
+	text := strings.TrimSpace(strings.ToLower(m.Content))
+	if strings.HasPrefix(text, CommandKeyword) {
 		return
 	}
 

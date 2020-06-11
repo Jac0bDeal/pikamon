@@ -8,13 +8,14 @@ import (
 )
 
 const (
-	commandKeyword = "p!ka"
+	CommandKeyword = "p!ka"
 )
 
 type handler func(*discordgo.Session, *discordgo.MessageCreate)
 
 var rootCommands = map[string]handler{
-	"help": help,
+	"help":  help,
+	"catch": catch,
 }
 
 // Handle processes all the commands that match the bot command keyword; chaining
@@ -30,16 +31,16 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	text := strings.TrimSpace(strings.ToLower(m.Content))
 
 	// ignore all messages not prefixed with bot command keyword
-	if !strings.HasPrefix(text, commandKeyword) {
+	if !strings.HasPrefix(text, CommandKeyword) {
 		return
 	}
-	commandText := strings.TrimSpace(text[len(commandKeyword):])
+	commandText := strings.TrimSpace(text[len(CommandKeyword):])
 	if commandText == "" {
 		return
 	}
 
 	// call the appropriate handler based on the root command
-	command := strings.SplitN(commandText, " ", 1)[0]
+	command := strings.Fields(commandText)[0]
 	next, exists := rootCommands[command]
 	if !exists {
 		log.Debugf("Received unrecognized command: %s", commandText)

@@ -2,10 +2,10 @@ package catch
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/bwmarrin/discordgo"
-	"github.com/pkg/errors"
+	"strings"
+
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
 )
 
 type catcher interface {
@@ -22,7 +22,8 @@ type Handler struct {
 
 // CatchHandler constructs and returns a new Handler that catches pokemon in the channels.
 // TODO - figure out if this should take the channel cache from the spawner
-func CatchHandler(s *discordgo.Session, m *discordgo.MessageCreate) (*Handler, error) {
+//func CatchHandler(s *discordgo.Session, m *discordgo.MessageCreate) (*Handler, error) {
+func CatchHandler(x int) (*Handler, error) {
 	return &Handler{}, nil
 }
 
@@ -34,32 +35,22 @@ func (h *Handler) CatchHandle(sess *discordgo.Session, m *discordgo.MessageCreat
 		return
 	}
 
-	fmt.Printf("Author ID: %s", m.Author.ID)
-}
+	//fmt.Printf("Author ID: %s\n", m.Author.ID)
+	//fmt.Printf("Message ID: %s\n", m.ID)
+	//fmt.Printf("Message content: %s\n", m.Content)
 
-/*
-func NewHandler(pokemonSpawnChance float64, debounceWindow time.Duration) (*Handler, error) {
-	pokemonSpawner, err := newPokemonSpawner(pokemonSpawnChance, debounceWindow)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to build pokemon spawner")
+	text := strings.TrimSpace(strings.ToLower(m.Content))
+	fmt.Printf("Message text: %s\n", text)
+
+	// ignore all messages not prefixed with bot command keyword
+	if !strings.HasPrefix(text, commands.CommandKeyword) {
+		fmt.Printf("CatchHandle: No pika command specified")
+		return
 	}
-	return &Handler{
-		spawners: []spawner{
-			pokemonSpawner,
-		},
-	}, nil
-}
-
-// Handle is the handler function registered on the discord bot that
-// processes incoming messages and calls into each spawner.
-func (h *Handler) Handle(sess *discordgo.Session, m *discordgo.MessageCreate) {
-	// ignore all messages created by the bot itself
-	if m.Author.ID == sess.State.User.ID {
+	commandText := strings.TrimSpace(text[len(commands.CommandKeyword):])
+	if commandText == "" {
 		return
 	}
 
-	for _, s := range h.spawners {
-		s.spawn(sess, m)
-	}
+	//fmt.Printf("CatchHandle: Command text = %s\n", commandText)
 }
-*/

@@ -8,7 +8,6 @@ import (
 
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/spawn"
-
 	"github.com/bwmarrin/discordgo"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -27,6 +26,8 @@ func New(cfg *Config) (*Bot, error) {
 		return nil, err
 	}
 
+	fmt.Printf("Adding handlers")
+
 	// TODO - We need to add the message ID of the spawned pokemon to a struct or other object to reference later
 	// If we know the message ID we can use the following to get the posted pokemon so we know what we are catching - https://discord.com/developers/docs/resources/channel#get-channel-message
 	// May also need to use the message metadata to determine if pokemon is still there unless that is what the DebounceWindow is
@@ -37,12 +38,11 @@ func New(cfg *Config) (*Bot, error) {
 		return nil, err
 	}
 
-	// TODO - Create catcher handler
-
 	// register discord handlers
 	discord.AddHandler(commands.Handle)
 	discord.AddHandler(listener.Handle)
-	// TODO - Add handler for catcher
+
+	fmt.Printf("Done adding handlers")
 
 	return &Bot{
 		discord: discord,

@@ -28,10 +28,7 @@ func New(cfg *Config) (*Bot, error) {
 	}
 
 	// Create bot cache
-	botCache, err := createBotCache(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create bot cache")
-	}
+	createBotCache(cfg)
 
 	fmt.Printf("Adding handlers")
 
@@ -40,14 +37,14 @@ func New(cfg *Config) (*Bot, error) {
 	// May also need to use the message metadata to determine if pokemon is still there unless that is what the DebounceWindow is
 	// we likely also need a way to determine when to clean up the pokemon that was last spawned. Perhaps that is its own issue.
 
-	listener, err := spawn.NewHandler(botCache, cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
+	spawnListener, err := spawn.NewHandler(util.BotMetadata, cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
 	if err != nil {
 		return nil, err
 	}
 
 	// register discord handlers
 	discord.AddHandler(commands.Handle)
-	discord.AddHandler(listener.Handle)
+	discord.AddHandler(spawnListener.Handle)
 
 	fmt.Printf("Done adding handlers")
 
@@ -89,7 +86,7 @@ func (b *Bot) Stop() error {
 }
 
 // Initialize bot cache object
-func createBotCache(cfg *Config) (*util.BotCache, error) {
+func createBotCache(cfg *Config) {
 	// Create our bot cache for channels
 	channelCache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: cfg.ChannelCache.NumCounters,
@@ -97,10 +94,11 @@ func createBotCache(cfg *Config) (*util.BotCache, error) {
 		BufferItems: cfg.ChannelCache.BufferItems,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create channel cache")
+		log.Fatal(err, "failed to create channel cache")
 	}
 
-	return &util.BotCache{
+	util.BotMetadata = &util.BotCache{
 		ChannelCache: channelCache,
-	}, nil
+		Sample:       "Hello world!",
+	}
 }

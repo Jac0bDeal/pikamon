@@ -1,56 +1,84 @@
 package catch
 
 import (
-	"fmt"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"github.com/bwmarrin/discordgo"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"strings"
+)
 
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
+const (
+	CommandKeyword = "p!ka"
 )
 
 type catcher interface {
 	catch(*discordgo.Session, *discordgo.MessageCreate) bool
 }
 
-// Handler listens to Pikamon catch messages in a channel and attempts
-// the catch operation with the specified pokeball.
+// Handler listens to non-Pikamon messages in a channel and  performs the
+// spawn operations.
 type Handler struct {
 	catchers []catcher
 }
 
-// TODO - first just build the catch. have it identify a catch message and print back to the channel "You caught it"
-
-// CatchHandler constructs and returns a new Handler that catches pokemon in the channels.
-// TODO - figure out if this should take the channel cache from the spawner
-//func CatchHandler(s *discordgo.Session, m *discordgo.MessageCreate) (*Handler, error) {
-func CatchHandler(x int) (*Handler, error) {
-	return &Handler{}, nil
+// Handler listens to Pikamon catch messages in a channel and attempts
+// the catch operation with the specified pokeball.
+type pokemonCatcher struct {
+	cache *util.BotCache
 }
 
-// CatchHandle is the handler function registered on the discord bot that
-// processes incoming messages and checks if we are catching a spawned pokemon
-func (h *Handler) CatchHandle(sess *discordgo.Session, m *discordgo.MessageCreate) {
+// NewHandler constructs and returns a new Handler that spawns things in channels.
+func NewCatchHandler(botCache *util.BotCache) (*Handler, error) {
+	catchPokemon, err := newPokemonCatcher(botCache)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to build pokemon spawner")
+	}
+
+	return &Handler{
+		catchers: []catcher{
+			catchPokemon,
+		},
+	}, nil
+}
+
+func newPokemonCatcher(botCache *util.BotCache) (*pokemonCatcher, error) {
+	return &pokemonCatcher{
+		cache: botCache,
+	}, nil
+}
+
+// Handle is the handler function registered on the discord bot that
+// processes incoming messages and calls into each spawner.
+func (h *Handler) Handle(sess *discordgo.Session, m *discordgo.MessageCreate) {
 	// ignore all messages created by the bot itself
 	if m.Author.ID == sess.State.User.ID {
 		return
 	}
 
-	//fmt.Printf("Author ID: %s\n", m.Author.ID)
-	//fmt.Printf("Message ID: %s\n", m.ID)
-	//fmt.Printf("Message content: %s\n", m.Content)
+	for _, s := range h.catchers {
+		s.catch(sess, m)
+	}
+}
 
+func (c *pokemonCatcher) catch(s *discordgo.Session, m *discordgo.MessageCreate) bool {
 	text := strings.TrimSpace(strings.ToLower(m.Content))
-	fmt.Printf("Message text: %s\n", text)
+	commandText := strings.TrimSpace(text[len(CommandKeyword):])
 
-	// ignore all messages not prefixed with bot command keyword
-	if !strings.HasPrefix(text, commands.CommandKeyword) {
-		fmt.Printf("CatchHandle: No pika command specified")
-		return
-	}
-	commandText := strings.TrimSpace(text[len(commands.CommandKeyword):])
-	if commandText == "" {
-		return
+	// Get everything after the "catch" command
+	commands := strings.Fields(commandText)[1:]
+	log.Info("Command String: %v\n", commands)
+
+	pokemon := strings.ToLower(commands[0])
+
+	// Check to see if they specify a pokeball type
+	var pokeball string
+	if len(commands) > 1 && strings.ToLower(commands[1]) == "with" {
+		pokeball = strings.ToLower(commands[2])
 	}
 
-	//fmt.Printf("CatchHandle: Command text = %s\n", commandText)
+	log.WithFields(log.Fields{
+		"pokemon":  pokemon,
+		"pokeball": pokeball,
+	}).Info("Trying to catch a pokemon!")
 }

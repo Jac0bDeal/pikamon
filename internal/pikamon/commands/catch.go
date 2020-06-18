@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -8,6 +9,8 @@ import (
 )
 
 func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
+	log.Infof("Bot sample value: %s", util.BotMetadata.Sample)
+
 	text := strings.TrimSpace(strings.ToLower(m.Content))
 	commandText := strings.TrimSpace(text[len(CommandKeyword):])
 

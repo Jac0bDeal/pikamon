@@ -2,15 +2,16 @@ package pikamon
 
 import (
 	"fmt"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/spawn"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
+	"github.com/bwmarrin/discordgo"
+	"github.com/dgraph-io/ristretto"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/spawn"
-	"github.com/bwmarrin/discordgo"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 // Bot listens to Discord and performs the various actions of Pikamon.
@@ -26,6 +27,12 @@ func New(cfg *Config) (*Bot, error) {
 		return nil, err
 	}
 
+	// Create bot cache
+	botCache, err := createBotCache(cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create bot cache")
+	}
+
 	fmt.Printf("Adding handlers")
 
 	// TODO - We need to add the message ID of the spawned pokemon to a struct or other object to reference later
@@ -33,7 +40,7 @@ func New(cfg *Config) (*Bot, error) {
 	// May also need to use the message metadata to determine if pokemon is still there unless that is what the DebounceWindow is
 	// we likely also need a way to determine when to clean up the pokemon that was last spawned. Perhaps that is its own issue.
 
-	listener, err := spawn.NewHandler(cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
+	listener, err := spawn.NewHandler(botCache, cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
 	if err != nil {
 		return nil, err
 	}
@@ -79,4 +86,21 @@ func (b *Bot) Start() error {
 // Stop gracefully shuts down the bot.
 func (b *Bot) Stop() error {
 	return b.discord.Close()
+}
+
+// Initialize bot cache object
+func createBotCache(cfg *Config) (*util.BotCache, error) {
+	// Create our bot cache for channels
+	channelCache, err := ristretto.NewCache(&ristretto.Config{
+		NumCounters: cfg.ChannelCache.NumCounters,
+		MaxCost:     cfg.ChannelCache.MaxCost,
+		BufferItems: cfg.ChannelCache.BufferItems,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create channel cache")
+	}
+
+	return &util.BotCache{
+		ChannelCache: channelCache,
+	}, nil
 }

@@ -2,12 +2,12 @@ package spawn
 
 import (
 	"fmt"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"math/rand"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/dgraph-io/ristretto"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,18 +17,15 @@ type pokemonSpawner struct {
 	debounceWindow time.Duration
 }
 
-func newPokemonSpawner(chance float64, debounceWindow time.Duration) (*pokemonSpawner, error) {
-	cache, err := ristretto.NewCache(&ristretto.Config{
-		NumCounters: 1e2,
-		MaxCost:     1e2,
-		BufferItems: 64,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create channel cache")
-	}
+type pokemonInfo struct {
+	pokemonName string
+	pokemonId   int
+}
+
+func newPokemonSpawner(botCache *util.BotCache, chance float64, debounceWindow time.Duration) (*pokemonSpawner, error) {
 	return &pokemonSpawner{
 		chance:         chance,
-		channelCache:   cache,
+		channelCache:   botCache.ChannelCache,
 		debounceWindow: debounceWindow,
 	}, nil
 }
@@ -48,6 +45,8 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 
 	// spawn a pokemon!
 	pokemonID := rand.Intn(890) + 1
+	// TODO - Use API to get name of pokemon with ID pokemonID
+	pokemonName := "SOME_POKEMON_NAME"
 	msg := discordgo.MessageEmbed{
 		Title:       "‌‌A wild pokémon has appeared!",
 		Description: "Guess the pokémon аnd type `p!ka catch <pokémon> with <ball>` to cаtch it!",
@@ -61,10 +60,16 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 		return false
 	}
 
-	// TODO - add pokemon to either channel cache or object.
+	// create pokemon info object
+	var pokemonObj *pokemonInfo = &pokemonInfo{
+		pokemonName: pokemonName,
+		pokemonId:   pokemonID,
+	}
+
+	log.Infof("Adding pokemon %s with id %d to cache", pokemonName, pokemonID)
 
 	// add channel id to cache, set to expire after the debounce window
-	p.channelCache.SetWithTTL(m.ChannelID, struct{}{}, 1, p.debounceWindow)
+	p.channelCache.SetWithTTL(m.ChannelID, pokemonObj, 1, p.debounceWindow)
 
 	return true
 }

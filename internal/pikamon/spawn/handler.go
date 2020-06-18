@@ -1,6 +1,7 @@
 package spawn
 
 import (
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"github.com/bwmarrin/discordgo"
 	"github.com/pkg/errors"
 	"strings"
@@ -23,11 +24,12 @@ type Handler struct {
 }
 
 // NewHandler constructs and returns a new Handler that spawns things in channels.
-func NewHandler(pokemonSpawnChance float64, debounceWindow time.Duration) (*Handler, error) {
-	pokemonSpawner, err := newPokemonSpawner(pokemonSpawnChance, debounceWindow)
+func NewHandler(botCache *util.BotCache, pokemonSpawnChance float64, debounceWindow time.Duration) (*Handler, error) {
+	pokemonSpawner, err := newPokemonSpawner(botCache, pokemonSpawnChance, debounceWindow)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build pokemon spawner")
 	}
+
 	return &Handler{
 		spawners: []spawner{
 			pokemonSpawner,

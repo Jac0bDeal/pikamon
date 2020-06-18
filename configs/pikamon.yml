@@ -4,3 +4,7 @@ pikamon:
   bot:
     debounce-window: 10s
     spawn-chance: 0.99
+  channelCache:
+    number-counters: 100
+    max-cost: 100
+    buffer-size: 64

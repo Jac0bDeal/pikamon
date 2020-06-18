@@ -17,11 +17,6 @@ type pokemonSpawner struct {
 	debounceWindow time.Duration
 }
 
-type PokemonInfo struct {
-	pokemonName string
-	pokemonId   int
-}
-
 func newPokemonSpawner(botCache *util.BotCache, chance float64, debounceWindow time.Duration) (*pokemonSpawner, error) {
 	return &pokemonSpawner{
 		chance:         chance,
@@ -45,8 +40,6 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 
 	// spawn a pokemon!
 	pokemonID := rand.Intn(890) + 1
-	// TODO - Use API to get name of pokemon with ID pokemonID
-	pokemonName := "SOME_POKEMON_NAME"
 	msg := discordgo.MessageEmbed{
 		Title:       "‌‌A wild pokémon has appeared!",
 		Description: "Guess the pokémon аnd type `p!ka catch <pokémon> with <ball>` to cаtch it!",
@@ -60,15 +53,8 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 		return false
 	}
 
-	// create pokemon info object
-	//var pokemonObj *PokemonInfo = &PokemonInfo{
-	//	pokemonName: pokemonName,
-	//	pokemonId:   pokemonID,
-	//}
-
-	log.Infof("Adding pokemon %s with id %d to cache", pokemonName, pokemonID)
-
 	// add channel id to cache, set to expire after the debounce window
+	log.Infof("Adding pokemon with id %d to channel cache", pokemonID)
 	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.debounceWindow)
 
 	return true

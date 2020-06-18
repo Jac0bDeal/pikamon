@@ -77,7 +77,6 @@ func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Create pokemon information object from the cache
 	var pokemonId = p.(int)
-	fmt.Println(pokemonId)
 	pInfo, err := pokeapi.Pokemon(strconv.Itoa(pokemonId))
 	if err != nil {
 		log.Error(err)
@@ -87,7 +86,7 @@ func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	text := strings.TrimSpace(strings.ToLower(m.Content))
 	commandText := strings.TrimSpace(text[len(util.CommandKeyword):])
 	commands := strings.Fields(commandText)[1:]
-	log.Info("Command String: %v\n", commands)
+	log.Infof("Command String: %v\n", commands)
 
 	// The pokemon name specified by the person trying to catch it
 	pokemonName := strings.ToLower(commands[0])

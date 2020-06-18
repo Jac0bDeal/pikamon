@@ -17,7 +17,7 @@ type pokemonSpawner struct {
 	debounceWindow time.Duration
 }
 
-type pokemonInfo struct {
+type PokemonInfo struct {
 	pokemonName string
 	pokemonId   int
 }
@@ -61,15 +61,15 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 	}
 
 	// create pokemon info object
-	var pokemonObj *pokemonInfo = &pokemonInfo{
-		pokemonName: pokemonName,
-		pokemonId:   pokemonID,
-	}
+	//var pokemonObj *PokemonInfo = &PokemonInfo{
+	//	pokemonName: pokemonName,
+	//	pokemonId:   pokemonID,
+	//}
 
 	log.Infof("Adding pokemon %s with id %d to cache", pokemonName, pokemonID)
 
 	// add channel id to cache, set to expire after the debounce window
-	p.channelCache.SetWithTTL(m.ChannelID, pokemonObj, 1, p.debounceWindow)
+	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.debounceWindow)
 
 	return true
 }

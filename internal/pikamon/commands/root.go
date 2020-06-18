@@ -1,14 +1,11 @@
 package commands
 
 import (
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
-)
-
-const (
-	CommandKeyword = "p!ka"
 )
 
 type handler func(*discordgo.Session, *discordgo.MessageCreate)
@@ -31,10 +28,10 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	text := strings.TrimSpace(strings.ToLower(m.Content))
 
 	// ignore all messages not prefixed with bot command keyword
-	if !strings.HasPrefix(text, CommandKeyword) {
+	if !strings.HasPrefix(text, util.CommandKeyword) {
 		return
 	}
-	commandText := strings.TrimSpace(text[len(CommandKeyword):])
+	commandText := strings.TrimSpace(text[len(util.CommandKeyword):])
 	if commandText == "" {
 		return
 	}

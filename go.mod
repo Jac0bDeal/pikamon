@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/bwmarrin/discordgo v0.20.3
 	github.com/dgraph-io/ristretto v0.0.2
-	github.com/golang/example v0.0.0-20170904185048-46695d81d1fa // indirect
+	github.com/mtslzr/pokeapi-go v1.4.0
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/pflag v1.0.3

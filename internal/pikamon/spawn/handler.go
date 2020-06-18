@@ -8,11 +8,6 @@ import (
 	"time"
 )
 
-// TODO - make global
-const (
-	CommandKeyword = "p!ka"
-)
-
 type spawner interface {
 	spawn(*discordgo.Session, *discordgo.MessageCreate) bool
 }
@@ -47,7 +42,7 @@ func (h *Handler) Handle(sess *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// ignore all messages prefixed with bot command keyword
 	text := strings.TrimSpace(strings.ToLower(m.Content))
-	if strings.HasPrefix(text, CommandKeyword) {
+	if strings.HasPrefix(text, util.CommandKeyword) {
 		return
 	}
 

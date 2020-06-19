@@ -31,7 +31,7 @@ func New(cfg *Config) (*Bot, error) {
 	newBotCache(cfg)
 
 	// register discord handlers
-	spawnListener, err := spawn.NewHandler(util.BotMetadata, cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
+	spawnListener, err := spawn.NewHandler(util.BotMetadata, cfg.Bot.SpawnChance, cfg.Bot.MinimumSpawnDuration)
 	if err != nil {
 		return nil, err
 	}

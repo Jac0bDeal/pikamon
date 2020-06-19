@@ -12,16 +12,16 @@ import (
 )
 
 type pokemonSpawner struct {
-	chance         float64
-	channelCache   *ristretto.Cache
-	debounceWindow time.Duration
+	chance               float64
+	channelCache         *ristretto.Cache
+	minimumSpawnDuration time.Duration
 }
 
-func newPokemonSpawner(botCache *util.BotCache, chance float64, debounceWindow time.Duration) (*pokemonSpawner, error) {
+func newPokemonSpawner(botCache *util.BotCache, chance float64, minimumSpawnDuration time.Duration) (*pokemonSpawner, error) {
 	return &pokemonSpawner{
-		chance:         chance,
-		channelCache:   botCache.ChannelCache,
-		debounceWindow: debounceWindow,
+		chance:               chance,
+		channelCache:         botCache.ChannelCache,
+		minimumSpawnDuration: minimumSpawnDuration,
 	}, nil
 }
 
@@ -55,7 +55,7 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 
 	// add channel id to cache, set to expire after the debounce window
 	log.Infof("Adding pokemon with id %d to channel cache", pokemonID)
-	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.debounceWindow)
+	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.minimumSpawnDuration)
 
 	return true
 }

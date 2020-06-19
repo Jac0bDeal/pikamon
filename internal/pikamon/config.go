@@ -17,8 +17,8 @@ type Config struct {
 		Level string
 	}
 	Bot struct {
-		DebounceWindow time.Duration
-		SpawnChance    float64
+		MinimumSpawnDuration time.Duration
+		SpawnChance          float64
 	}
 
 	ChannelCache struct {
@@ -45,7 +45,7 @@ func GetConfig() (*Config, error) {
 		return nil, errors.Wrap(err, "failed to read config file")
 	}
 	cfg.Logging.Level = viper.GetString("pikamon.logging.level")
-	cfg.Bot.DebounceWindow = viper.GetDuration("pikamon.bot.debounce-window")
+	cfg.Bot.MinimumSpawnDuration = viper.GetDuration("pikamon.bot.minimum-spawn-duration")
 	cfg.Bot.SpawnChance = viper.GetFloat64("pikamon.bot.spawn-chance")
 	cfg.ChannelCache.NumCounters = viper.GetInt64("pikamon.channel-cache.number-counters")
 	cfg.ChannelCache.MaxCost = viper.GetInt64("pikamon.channel-cache.max-cost")

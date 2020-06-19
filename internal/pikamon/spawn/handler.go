@@ -19,8 +19,8 @@ type Handler struct {
 }
 
 // NewHandler constructs and returns a new Handler that spawns things in channels.
-func NewHandler(botCache *util.BotCache, pokemonSpawnChance float64, debounceWindow time.Duration) (*Handler, error) {
-	pokemonSpawner, err := newPokemonSpawner(botCache, pokemonSpawnChance, debounceWindow)
+func NewHandler(botCache *util.BotCache, pokemonSpawnChance float64, minimumSpawnDuration time.Duration) (*Handler, error) {
+	pokemonSpawner, err := newPokemonSpawner(botCache, pokemonSpawnChance, minimumSpawnDuration)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build pokemon spawner")
 	}

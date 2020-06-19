@@ -37,12 +37,19 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// call the appropriate handler based on the root command
-	command := strings.Fields(commandText)[0]
+	commands := strings.Fields(commandText)
+
+	command := "help" // Default to help if not enough commands are passed
+	if len(commands) > 0 {
+		command = commands[0]
+	}
+
 	next, exists := rootCommands[command]
 	if !exists {
 		log.Debugf("Received unrecognized command: %s", commandText)
-		return
+		next = rootCommands["help"] // Default to help for invalid command
 	}
+
 	log.Debugf("Received command: %s", commandText)
 	next(s, m)
 }

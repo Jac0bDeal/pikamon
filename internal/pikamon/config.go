@@ -47,9 +47,9 @@ func GetConfig() (*Config, error) {
 	cfg.Logging.Level = viper.GetString("pikamon.logging.level")
 	cfg.Bot.DebounceWindow = viper.GetDuration("pikamon.bot.debounce-window")
 	cfg.Bot.SpawnChance = viper.GetFloat64("pikamon.bot.spawn-chance")
-	cfg.ChannelCache.NumCounters = viper.GetInt64("pikamon.channelCache.number-counters")
-	cfg.ChannelCache.MaxCost = viper.GetInt64("pikamon.channelCache.max-cost")
-	cfg.ChannelCache.BufferItems = viper.GetInt64("pikamon.channelCache.buffer-size")
+	cfg.ChannelCache.NumCounters = viper.GetInt64("pikamon.channel-cache.number-counters")
+	cfg.ChannelCache.MaxCost = viper.GetInt64("pikamon.channel-cache.max-cost")
+	cfg.ChannelCache.BufferItems = viper.GetInt64("pikamon.channel-cache.buffer-size")
 
 	// define flags
 	pflag.StringVarP(&cfg.Discord.Token, "token", "t", "", "Bot Token")

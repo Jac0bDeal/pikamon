@@ -28,7 +28,7 @@ func New(cfg *Config) (*Bot, error) {
 	}
 
 	// Create bot cache
-	createBotCache(cfg)
+	newBotCache(cfg)
 
 	// register discord handlers
 	spawnListener, err := spawn.NewHandler(util.BotMetadata, cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
@@ -77,7 +77,7 @@ func (b *Bot) Stop() error {
 }
 
 // Initialize bot cache object
-func createBotCache(cfg *Config) {
+func newBotCache(cfg *Config) {
 	// Create our bot cache for channels
 	channelCache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: cfg.ChannelCache.NumCounters,

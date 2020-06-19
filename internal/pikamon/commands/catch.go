@@ -23,53 +23,47 @@ var catchFailureMessages = []string{
 	"Have you tried getting good?",
 }
 
-func pokemonExpiredFailure(s *discordgo.Session, m *discordgo.MessageCreate) bool {
+func publishExpiredPokemon(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
 	expireMessageIndex := rand.Intn(len(pokemonExpiredMessages))
 	expireMessage := "You have failed to catch the pokemon! " + pokemonExpiredMessages[expireMessageIndex]
 	msg := discordgo.MessageEmbed{
 		Title:       "The Pokemon has run away!",
 		Description: expireMessage,
+		Color:       0x008080,
 	}
-	if _, err := s.ChannelMessageSendEmbed(m.ChannelID, &msg); err != nil {
-		log.Error(err)
-		return false
-	}
-	return true
+	_, err = s.ChannelMessageSendEmbed(m.ChannelID, &msg)
+	return err
 }
 
-func catchFailure(s *discordgo.Session, m *discordgo.MessageCreate) bool {
+func publichCatchFailure(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
 	catchFailureMessageIndex := rand.Intn(len(catchFailureMessages))
 	expireMessage := fmt.Sprintf("%s has failed to catch the pokemon! %s", m.Author.Username, catchFailureMessages[catchFailureMessageIndex])
 	msg := discordgo.MessageEmbed{
 		Description: expireMessage,
+		Color:       0x008080,
 	}
-	if _, err := s.ChannelMessageSendEmbed(m.ChannelID, &msg); err != nil {
-		log.Error(err)
-		return false
-	}
-	return true
+	_, err = s.ChannelMessageSendEmbed(m.ChannelID, &msg)
+	return err
 }
 
-func publishSuccessfulCatch(s *discordgo.Session, m *discordgo.MessageCreate, pName string) bool {
+func publishSuccessfulCatch(s *discordgo.Session, m *discordgo.MessageCreate, pName string) (err error) {
 	// TODO - save to database
-	catchMessage := fmt.Sprintf("Congratulations %s! You caught a %s", m.Author.Username, pName)
+	catchMessage := fmt.Sprintf("Congratulations %s! You caught a %s!", m.Author.Username, strings.Title(pName))
 	msg := discordgo.MessageEmbed{
 		Description: catchMessage,
+		Color:       0x008080,
 	}
-	if _, err := s.ChannelMessageSendEmbed(m.ChannelID, &msg); err != nil {
-		log.Error(err)
-		return false
-	}
-	return true
+	_, err = s.ChannelMessageSendEmbed(m.ChannelID, &msg)
+	return err
 }
 
 func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// check if channel id is still in cache. If it is not then there is nothing to catch
 	p, exists := util.BotMetadata.ChannelCache.Get(m.ChannelID)
 	if !exists {
-		publishFailure := pokemonExpiredFailure(s, m)
-		if !publishFailure {
-			log.Error("Unable to publish pokemonExpiredFailure message to channel")
+		err := publishExpiredPokemon(s, m)
+		if err != nil {
+			log.Error(err)
 		}
 		return
 	}
@@ -88,7 +82,14 @@ func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	commands := strings.Fields(commandText)[1:]
 	log.Infof("Command String: %v\n", commands)
 
-	// The pokemon name specified by the person trying to catch it
+	// Get the pokemon name specified by the person trying to catch it and handle the case where no name was passed
+	if len(commands) == 0 {
+		err := publichCatchFailure(s, m)
+		if err != nil {
+			log.Error(err)
+		}
+		return
+	}
 	pokemonName := strings.ToLower(commands[0])
 
 	// Check to see if they specify a pokeball type
@@ -105,9 +106,9 @@ func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// Perform catch attempt
 	var expectedPokemonName string = pInfo.Name
 	if strings.EqualFold(pokemonName, expectedPokemonName) {
-		publishFailure := publishSuccessfulCatch(s, m, expectedPokemonName)
-		if !publishFailure {
-			log.Error("Unable to publish publishSuccessfulCatch message to channel")
+		err := publishSuccessfulCatch(s, m, expectedPokemonName)
+		if err != nil {
+			log.Error(err)
 		}
 
 		log.Debug("Removing channel cache")
@@ -115,9 +116,9 @@ func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	} else {
 		log.Info("TODO - block the same user from retrying catch")
 
-		publishFailure := catchFailure(s, m)
-		if !publishFailure {
-			log.Error("Unable to publish catchFailure message to channel")
+		err := publichCatchFailure(s, m)
+		if err != nil {
+			log.Error(err)
 		}
 	}
 }

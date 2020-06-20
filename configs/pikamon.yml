@@ -2,5 +2,9 @@ pikamon:
   logging:
     level: debug
   bot:
-    debounce-window: 10s
-    spawn-chance: 0.05
+    minimum-spawn-duration: 60s
+    spawn-chance: 0.08
+  channel-cache:
+    number-counters: 100
+    max-cost: 100
+    buffer-size: 64

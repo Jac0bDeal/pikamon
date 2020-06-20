@@ -1,10 +1,11 @@
 package spawn
 
 import (
-	"time"
-
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"github.com/bwmarrin/discordgo"
 	"github.com/pkg/errors"
+	"strings"
+	"time"
 )
 
 type spawner interface {
@@ -18,11 +19,12 @@ type Handler struct {
 }
 
 // NewHandler constructs and returns a new Handler that spawns things in channels.
-func NewHandler(pokemonSpawnChance float64, debounceWindow time.Duration) (*Handler, error) {
-	pokemonSpawner, err := newPokemonSpawner(pokemonSpawnChance, debounceWindow)
+func NewHandler(botCache *util.BotCache, pokemonSpawnChance float64, minimumSpawnDuration time.Duration) (*Handler, error) {
+	pokemonSpawner, err := newPokemonSpawner(botCache, pokemonSpawnChance, minimumSpawnDuration)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build pokemon spawner")
 	}
+
 	return &Handler{
 		spawners: []spawner{
 			pokemonSpawner,
@@ -35,6 +37,12 @@ func NewHandler(pokemonSpawnChance float64, debounceWindow time.Duration) (*Hand
 func (h *Handler) Handle(sess *discordgo.Session, m *discordgo.MessageCreate) {
 	// ignore all messages created by the bot itself
 	if m.Author.ID == sess.State.User.ID {
+		return
+	}
+
+	// ignore all messages prefixed with bot command keyword
+	text := strings.TrimSpace(strings.ToLower(m.Content))
+	if strings.HasPrefix(text, util.CommandKeyword) {
 		return
 	}
 

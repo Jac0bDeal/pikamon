@@ -2,16 +2,16 @@ package pikamon
 
 import (
 	"fmt"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/spawn"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
+	"github.com/bwmarrin/discordgo"
+	"github.com/dgraph-io/ristretto"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/spawn"
-
-	"github.com/bwmarrin/discordgo"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 // Bot listens to Discord and performs the various actions of Pikamon.
@@ -27,14 +27,17 @@ func New(cfg *Config) (*Bot, error) {
 		return nil, err
 	}
 
-	listener, err := spawn.NewHandler(cfg.Bot.SpawnChance, cfg.Bot.DebounceWindow)
+	// Create bot cache
+	newBotCache(cfg)
+
+	// register discord handlers
+	spawnListener, err := spawn.NewHandler(util.BotMetadata, cfg.Bot.SpawnChance, cfg.Bot.MinimumSpawnDuration)
 	if err != nil {
 		return nil, err
 	}
 
-	// register discord handlers
 	discord.AddHandler(commands.Handle)
-	discord.AddHandler(listener.Handle)
+	discord.AddHandler(spawnListener.Handle)
 
 	return &Bot{
 		discord: discord,
@@ -71,4 +74,21 @@ func (b *Bot) Start() error {
 // Stop gracefully shuts down the bot.
 func (b *Bot) Stop() error {
 	return b.discord.Close()
+}
+
+// Initialize bot cache object
+func newBotCache(cfg *Config) {
+	// Create our bot cache for channels
+	channelCache, err := ristretto.NewCache(&ristretto.Config{
+		NumCounters: cfg.ChannelCache.NumCounters,
+		MaxCost:     cfg.ChannelCache.MaxCost,
+		BufferItems: cfg.ChannelCache.BufferItems,
+	})
+	if err != nil {
+		log.Fatal(err, "failed to create channel cache")
+	}
+
+	util.BotMetadata = &util.BotCache{
+		ChannelCache: channelCache,
+	}
 }

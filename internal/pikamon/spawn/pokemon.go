@@ -2,34 +2,26 @@ package spawn
 
 import (
 	"fmt"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"math/rand"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/dgraph-io/ristretto"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
 type pokemonSpawner struct {
-	chance         float64
-	channelCache   *ristretto.Cache
-	debounceWindow time.Duration
+	chance               float64
+	channelCache         *ristretto.Cache
+	minimumSpawnDuration time.Duration
 }
 
-func newPokemonSpawner(chance float64, debounceWindow time.Duration) (*pokemonSpawner, error) {
-	cache, err := ristretto.NewCache(&ristretto.Config{
-		NumCounters: 1e2,
-		MaxCost:     1e2,
-		BufferItems: 64,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create channel cache")
-	}
+func newPokemonSpawner(botCache *util.BotCache, chance float64, minimumSpawnDuration time.Duration) (*pokemonSpawner, error) {
 	return &pokemonSpawner{
-		chance:         chance,
-		channelCache:   cache,
-		debounceWindow: debounceWindow,
+		chance:               chance,
+		channelCache:         botCache.ChannelCache,
+		minimumSpawnDuration: minimumSpawnDuration,
 	}, nil
 }
 
@@ -62,7 +54,8 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 	}
 
 	// add channel id to cache, set to expire after the debounce window
-	p.channelCache.SetWithTTL(m.ChannelID, struct{}{}, 1, p.debounceWindow)
+	log.Infof("Adding pokemon with id %d to channel cache", pokemonID)
+	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.minimumSpawnDuration)
 
 	return true
 }

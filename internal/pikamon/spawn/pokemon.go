@@ -39,7 +39,7 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 	}
 
 	// spawn a pokemon!
-	pokemonID := rand.Intn(890) + 1
+	pokemonID := rand.Intn(807) + 1
 	msg := discordgo.MessageEmbed{
 		Title:       "‌‌A wild pokémon has appeared!",
 		Description: "Guess the pokémon аnd type `p!ka catch <pokémon> with <ball>` to cаtch it!",

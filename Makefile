@@ -7,4 +7,4 @@ bot-pi:
 	env GOOS=linux GOARCH=arm GOARM=7 go build -o bin/pi/pikamon ./cmd/pikamon
 
 clean:
-	rm bin/*
+	rm -rf bin/*

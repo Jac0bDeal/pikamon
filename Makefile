@@ -1,10 +1,13 @@
-all: clean build
+all: clean bot bot-pi
 
 bot:
-	go build -o bin/pikamon ./cmd/pikamon
+	@echo "Building bot binary for use on local system..."
+	@go build -o bin/pikamon ./cmd/pikamon
 
 bot-pi:
-	env GOOS=linux GOARCH=arm GOARM=7 go build -o bin/pi/pikamon ./cmd/pikamon
+	@echo "Building bot binary for use on raspbian..."
+	@env GOOS=linux GOARCH=arm GOARM=7 go build -o bin/pi/pikamon ./cmd/pikamon
 
 clean:
-	rm -rf bin/*
+	@echo "Cleaning bin/..."
+	@rm -rf bin/*

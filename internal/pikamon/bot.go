@@ -2,16 +2,16 @@ package pikamon
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/spawn"
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"github.com/bwmarrin/discordgo"
 	"github.com/dgraph-io/ristretto"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // Bot listens to Discord and performs the various actions of Pikamon.
@@ -28,16 +28,23 @@ func New(cfg *Config) (*Bot, error) {
 	}
 
 	// Create bot cache
-	newBotCache(cfg)
+	botCache := newBotCache(cfg)
 
 	// register discord handlers
-	spawnListener, err := spawn.NewHandler(util.BotMetadata, cfg.Bot.SpawnChance, cfg.Bot.MinimumSpawnDuration)
+	commandsHandler := commands.NewHandler(botCache.ChannelCache)
+
+	spawnHandler, err := spawn.NewHandler(
+		botCache.ChannelCache,
+		cfg.Bot.SpawnChance,
+		cfg.Bot.MaximumSpawnDuration,
+		cfg.Bot.MaxPokemonID,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	discord.AddHandler(commands.Handle)
-	discord.AddHandler(spawnListener.Handle)
+	discord.AddHandler(commandsHandler.Handle)
+	discord.AddHandler(spawnHandler.Handle)
 
 	return &Bot{
 		discord: discord,
@@ -76,8 +83,13 @@ func (b *Bot) Stop() error {
 	return b.discord.Close()
 }
 
+// Create a cache object for the Bot. May contain different caches of varying sizes (used for different purposes)
+type BotCache struct {
+	ChannelCache *ristretto.Cache
+}
+
 // Initialize bot cache object
-func newBotCache(cfg *Config) {
+func newBotCache(cfg *Config) *BotCache {
 	// Create our bot cache for channels
 	channelCache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: cfg.ChannelCache.NumCounters,
@@ -88,7 +100,7 @@ func newBotCache(cfg *Config) {
 		log.Fatal(err, "failed to create channel cache")
 	}
 
-	util.BotMetadata = &util.BotCache{
+	return &BotCache{
 		ChannelCache: channelCache,
 	}
 }

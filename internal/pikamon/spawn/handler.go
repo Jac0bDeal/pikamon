@@ -1,11 +1,13 @@
 package spawn
 
 import (
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
-	"github.com/bwmarrin/discordgo"
-	"github.com/pkg/errors"
 	"strings"
 	"time"
+
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
+	"github.com/bwmarrin/discordgo"
+	"github.com/dgraph-io/ristretto"
+	"github.com/pkg/errors"
 )
 
 type spawner interface {
@@ -19,8 +21,13 @@ type Handler struct {
 }
 
 // NewHandler constructs and returns a new Handler that spawns things in channels.
-func NewHandler(botCache *util.BotCache, pokemonSpawnChance float64, minimumSpawnDuration time.Duration) (*Handler, error) {
-	pokemonSpawner, err := newPokemonSpawner(botCache, pokemonSpawnChance, minimumSpawnDuration)
+func NewHandler(
+	channelCache *ristretto.Cache,
+	pokemonSpawnChance float64,
+	maximumSpawnDuration time.Duration,
+	maxPokemonID int,
+) (*Handler, error) {
+	pokemonSpawner, err := newPokemonSpawner(channelCache, pokemonSpawnChance, maximumSpawnDuration, maxPokemonID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build pokemon spawner")
 	}
@@ -42,7 +49,7 @@ func (h *Handler) Handle(sess *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// ignore all messages prefixed with bot command keyword
 	text := strings.TrimSpace(strings.ToLower(m.Content))
-	if strings.HasPrefix(text, util.CommandKeyword) {
+	if strings.HasPrefix(text, commands.CommandKeyword) {
 		return
 	}
 

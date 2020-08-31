@@ -59,8 +59,10 @@ func publishSuccessfulCatch(s *discordgo.Session, m *discordgo.MessageCreate, po
 }
 
 func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
+	// lock a mutex here so that multiple people can't catch the pokemon at the same time.
 	h.catchMtx.Lock()
 	defer h.catchMtx.Unlock()
+
 	// check if channel id is still in cache. If it is not then there is nothing to catch
 	p, exists := h.channelCache.Get(m.ChannelID)
 	if !exists {

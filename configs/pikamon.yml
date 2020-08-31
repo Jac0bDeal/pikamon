@@ -2,8 +2,9 @@ pikamon:
   logging:
     level: debug
   bot:
-    minimum-spawn-duration: 60s
+    maximum-spawn-duration: 300s
     spawn-chance: 0.08
+    max-pokemon-id: 807
   channel-cache:
     number-counters: 100
     max-cost: 100

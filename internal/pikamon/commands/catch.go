@@ -2,25 +2,25 @@ package commands
 
 import (
 	"fmt"
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
-	"github.com/bwmarrin/discordgo"
-	"github.com/mtslzr/pokeapi-go"
-	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
 	"strings"
+
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/constants"
+	"github.com/bwmarrin/discordgo"
+	"github.com/mtslzr/pokeapi-go"
+	log "github.com/sirupsen/logrus"
 )
 
 var pokemonExpiredMessages = []string{
 	"The pokemon heard you coming and ran for the hills!",
-	"The pokemon thought you were ugly and didn't want to be caught by an ugly person!",
-	"The pokemon likes Physics (mistakenly) and thought you were too dumb to understand it so it ran!",
+	"The pokemon got scared and fled!",
+	"The pokemon got away!",
 }
 
 var catchFailureMessages = []string{
-	"You may need to have your eyes checked!",
-	"Better luck next time!",
-	"Have you tried getting good?",
+	"Oof, that is the wrong pokemon!",
+	"Darn, the pokemon broke free!",
 }
 
 func publishExpiredPokemon(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
@@ -29,7 +29,7 @@ func publishExpiredPokemon(s *discordgo.Session, m *discordgo.MessageCreate) (er
 	msg := discordgo.MessageEmbed{
 		Title:       "The Pokemon has run away!",
 		Description: expireMessage,
-		Color:       0x008080,
+		Color:       constants.MessageColor,
 	}
 	_, err = s.ChannelMessageSendEmbed(m.ChannelID, &msg)
 	return err
@@ -40,26 +40,27 @@ func publichCatchFailure(s *discordgo.Session, m *discordgo.MessageCreate) (err 
 	expireMessage := fmt.Sprintf("%s has failed to catch the pokemon! %s", m.Author.Username, catchFailureMessages[catchFailureMessageIndex])
 	msg := discordgo.MessageEmbed{
 		Description: expireMessage,
-		Color:       0x008080,
+		Color:       constants.MessageColor,
 	}
 	_, err = s.ChannelMessageSendEmbed(m.ChannelID, &msg)
 	return err
 }
 
-func publishSuccessfulCatch(s *discordgo.Session, m *discordgo.MessageCreate, pName string) (err error) {
+func publishSuccessfulCatch(s *discordgo.Session, m *discordgo.MessageCreate, pokemon string) (err error) {
 	// TODO - save to database
-	catchMessage := fmt.Sprintf("Congratulations %s! You caught a %s!", m.Author.Username, strings.Title(pName))
+	catchMessage := fmt.Sprintf("Congratulations %s! You caught a %s!", m.Author.Username, strings.Title(pokemon))
+
 	msg := discordgo.MessageEmbed{
 		Description: catchMessage,
-		Color:       0x008080,
+		Color:       constants.MessageColor,
 	}
 	_, err = s.ChannelMessageSendEmbed(m.ChannelID, &msg)
 	return err
 }
 
-func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// check if channel id is still in cache. If it is not then there is nothing to catch
-	p, exists := util.BotMetadata.ChannelCache.Get(m.ChannelID)
+	p, exists := h.channelCache.Get(m.ChannelID)
 	if !exists {
 		err := publishExpiredPokemon(s, m)
 		if err != nil {
@@ -78,7 +79,7 @@ func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Get everything after the "catch" command
 	text := strings.TrimSpace(strings.ToLower(m.Content))
-	commandText := strings.TrimSpace(text[len(util.CommandKeyword):])
+	commandText := strings.TrimSpace(text[len(CommandKeyword):])
 	commands := strings.Fields(commandText)[1:]
 	log.Infof("Command String: %v\n", commands)
 
@@ -101,10 +102,10 @@ func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	log.WithFields(log.Fields{
 		"pokemon":  pokemonName,
 		"pokeball": pokeball,
-	}).Info("Trying to catch a pokemon!")
+	}).Debug("Trying to catch a pokemon!")
 
 	// Perform catch attempt
-	var expectedPokemonName string = pInfo.Name
+	expectedPokemonName := pInfo.Name
 	if strings.EqualFold(pokemonName, expectedPokemonName) {
 		err := publishSuccessfulCatch(s, m, expectedPokemonName)
 		if err != nil {
@@ -112,7 +113,7 @@ func catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		log.Debug("Removing channel cache")
-		util.BotMetadata.ChannelCache.Del(m.ChannelID)
+		h.channelCache.Del(m.ChannelID)
 	} else {
 		log.Info("TODO - block the same user from retrying catch")
 

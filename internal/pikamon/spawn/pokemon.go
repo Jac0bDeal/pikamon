@@ -2,10 +2,10 @@ package spawn
 
 import (
 	"fmt"
-	"github.com/Jac0bDeal/pikamon/internal/pikamon/util"
 	"math/rand"
 	"time"
 
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/constants"
 	"github.com/bwmarrin/discordgo"
 	"github.com/dgraph-io/ristretto"
 	log "github.com/sirupsen/logrus"
@@ -14,14 +14,21 @@ import (
 type pokemonSpawner struct {
 	chance               float64
 	channelCache         *ristretto.Cache
-	minimumSpawnDuration time.Duration
+	maximumSpawnDuration time.Duration
+	maxPokemonID         int
 }
 
-func newPokemonSpawner(botCache *util.BotCache, chance float64, minimumSpawnDuration time.Duration) (*pokemonSpawner, error) {
+func newPokemonSpawner(
+	channelCache *ristretto.Cache,
+	chance float64,
+	maximumSpawnDuration time.Duration,
+	maxPokemonID int,
+) (*pokemonSpawner, error) {
 	return &pokemonSpawner{
 		chance:               chance,
-		channelCache:         botCache.ChannelCache,
-		minimumSpawnDuration: minimumSpawnDuration,
+		channelCache:         channelCache,
+		maximumSpawnDuration: maximumSpawnDuration,
+		maxPokemonID:         maxPokemonID,
 	}, nil
 }
 
@@ -39,11 +46,11 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 	}
 
 	// spawn a pokemon!
-	pokemonID := rand.Intn(807) + 1
+	pokemonID := rand.Intn(p.maxPokemonID) + 1
 	msg := discordgo.MessageEmbed{
 		Title:       "‌‌A wild pokémon has appeared!",
 		Description: "Guess the pokémon аnd type `p!ka catch <pokémon> with <ball>` to cаtch it!",
-		Color:       0x008080,
+		Color:       constants.MessageColor,
 		Image: &discordgo.MessageEmbedImage{
 			URL: fmt.Sprintf("https://pokeres.bastionbot.org/images/pokemon/%d.png", pokemonID),
 		},
@@ -55,7 +62,7 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 
 	// add channel id to cache, set to expire after the debounce window
 	log.Infof("Adding pokemon with id %d to channel cache", pokemonID)
-	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.minimumSpawnDuration)
+	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.maximumSpawnDuration)
 
 	return true
 }

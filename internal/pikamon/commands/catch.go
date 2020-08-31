@@ -59,6 +59,8 @@ func publishSuccessfulCatch(s *discordgo.Session, m *discordgo.MessageCreate, po
 }
 
 func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
+	h.catchMtx.Lock()
+	defer h.catchMtx.Unlock()
 	// check if channel id is still in cache. If it is not then there is nothing to catch
 	p, exists := h.channelCache.Get(m.ChannelID)
 	if !exists {
@@ -68,7 +70,7 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		return
 	}
-	log.Debug("Pokemon cache still exists. Attempting catch.")
+	log.Debug("Pokemon cache still exists, attempting catch...")
 
 	// Create pokemon information object from the cache
 	var pokemonId = p.(int)

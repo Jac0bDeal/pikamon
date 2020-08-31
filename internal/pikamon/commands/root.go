@@ -2,6 +2,7 @@ package commands
 
 import (
 	"strings"
+	"sync"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/dgraph-io/ristretto"
@@ -20,11 +21,13 @@ type handler func(*discordgo.Session, *discordgo.MessageCreate)
 
 type Handler struct {
 	channelCache *ristretto.Cache
+	catchMtx     *sync.Mutex
 }
 
 func NewHandler(channelCache *ristretto.Cache) *Handler {
 	return &Handler{
 		channelCache: channelCache,
+		catchMtx:     &sync.Mutex{},
 	}
 }
 

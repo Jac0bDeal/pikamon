@@ -25,7 +25,7 @@ var catchFailureMessages = []string{
 
 func publishExpiredPokemon(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
 	expireMessageIndex := rand.Intn(len(pokemonExpiredMessages))
-	expireMessage := "You have failed to catch the pokemon! " + pokemonExpiredMessages[expireMessageIndex]
+	expireMessage := pokemonExpiredMessages[expireMessageIndex]
 	msg := discordgo.MessageEmbed{
 		Title:       "The Pokemon has run away!",
 		Description: expireMessage,
@@ -37,7 +37,7 @@ func publishExpiredPokemon(s *discordgo.Session, m *discordgo.MessageCreate) (er
 
 func publichCatchFailure(s *discordgo.Session, m *discordgo.MessageCreate) (err error) {
 	catchFailureMessageIndex := rand.Intn(len(catchFailureMessages))
-	expireMessage := fmt.Sprintf("%s has failed to catch the pokemon! %s", m.Author.Username, catchFailureMessages[catchFailureMessageIndex])
+	expireMessage := fmt.Sprintf("<@%s> has failed to catch the pokemon! %s", m.Author.ID, catchFailureMessages[catchFailureMessageIndex])
 	msg := discordgo.MessageEmbed{
 		Description: expireMessage,
 		Color:       constants.MessageColor,
@@ -48,7 +48,7 @@ func publichCatchFailure(s *discordgo.Session, m *discordgo.MessageCreate) (err 
 
 func publishSuccessfulCatch(s *discordgo.Session, m *discordgo.MessageCreate, pokemon string) (err error) {
 	// TODO - save to database
-	catchMessage := fmt.Sprintf("Congratulations %s! You caught a %s!", m.Author.Username, strings.Title(pokemon))
+	catchMessage := fmt.Sprintf("Congratulations <@%s>, you caught a %s!", m.Author.ID, strings.Title(pokemon))
 
 	msg := discordgo.MessageEmbed{
 		Description: catchMessage,

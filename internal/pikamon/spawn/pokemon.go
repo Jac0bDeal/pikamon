@@ -49,7 +49,7 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 	pokemonID := rand.Intn(p.maxPokemonID) + 1
 	msg := discordgo.MessageEmbed{
 		Title:       "‌‌A wild pokémon has appeared!",
-		Description: "Guess the pokémon аnd type `p!ka catch <pokémon> with <ball>` to cаtch it!",
+		Description: "Guess the pokémon аnd type `p!ka catch <pokémon>` to cаtch it!",
 		Color:       constants.MessageColor,
 		Image: &discordgo.MessageEmbedImage{
 			URL: fmt.Sprintf("https://pokeres.bastionbot.org/images/pokemon/%d.png", pokemonID),

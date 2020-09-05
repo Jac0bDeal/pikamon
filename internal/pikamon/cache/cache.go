@@ -3,6 +3,7 @@ package cache
 import (
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/config"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/dgraph-io/ristretto"
 )
@@ -14,7 +15,7 @@ type Cache struct {
 
 // New builds and returns a pointer to a Cache object.
 func New(cfg *config.Config) (*Cache, error) {
-	// Create our bot cache for channels
+	log.Debug("Creating channel cache...")
 	channelCache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: cfg.Cache.Channel.NumCounters,
 		MaxCost:     cfg.Cache.Channel.MaxCost,
@@ -23,6 +24,7 @@ func New(cfg *config.Config) (*Cache, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build channel cache")
 	}
+	log.Debug("Channel cache created.")
 
 	return &Cache{
 		Channel: channelCache,

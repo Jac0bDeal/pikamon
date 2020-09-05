@@ -26,39 +26,43 @@ type Bot struct {
 
 // New configures a Bot from the passed config, and returns it.
 func New(cfg *config.Config) (*Bot, error) {
+	log.Info("Creating Discord session...")
 	authStr := fmt.Sprintf("Bot %s", cfg.Discord.Token)
 	discord, err := discordgo.New(authStr)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("Discord session created.")
 
-	// create bot cache
+	log.Info("Creating bot cache...")
 	botCache, err := cache.New(cfg)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("Bot cache created.")
 
-	// create bot store
+	log.Info("Creating bot store...")
 	botStore, err := store.New(cfg)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("Bot store created.")
 
-	// register discord handlers
+	log.Info("Registering bot handlers...")
+	log.Debug("Registering commands handler...")
 	commandsHandler := commands.NewHandler(botCache.Channel)
+	discord.AddHandler(commandsHandler.Handle)
+	log.Debug("Commands handler registered.")
 
-	spawnHandler, err := spawn.NewHandler(
+	log.Debug("Registering spawn handler...")
+	spawnHandler := spawn.NewHandler(
 		botCache.Channel,
 		cfg.Bot.SpawnChance,
 		cfg.Bot.MaximumSpawnDuration,
 		cfg.Bot.MaxPokemonID,
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	discord.AddHandler(commandsHandler.Handle)
 	discord.AddHandler(spawnHandler.Handle)
+	log.Debug("Spawn handler registered.")
 
 	return &Bot{
 		cache:   botCache,
@@ -69,7 +73,6 @@ func New(cfg *config.Config) (*Bot, error) {
 
 // Run starts the bot, listens for a halt signal, and shuts down when the halt is received.
 func (b *Bot) Run() error {
-	log.Info("Starting bot...")
 	if err := b.Start(); err != nil {
 		return errors.Wrap(err, "failed to start bot")
 	}
@@ -86,17 +89,22 @@ func (b *Bot) Run() error {
 
 // Start opens the connection to the discord web socket.
 func (b *Bot) Start() error {
+	log.Info("Starting bot...")
 	if err := b.store.Open(); err != nil {
 		return errors.Wrap(err, "failed to open pikamon store")
 	}
+
+	log.Info("Opening connection to Discord...")
 	if err := b.discord.Open(); err != nil {
 		return errors.Wrap(err, "failed to open web socket connection to Discord")
 	}
+	log.Info("Connection to Discord established.")
 	return nil
 }
 
 // Stop gracefully shuts down the bot.
 func (b *Bot) Stop() {
+	log.Info("Stopping bot...")
 	err := b.discord.Close()
 	if err != nil {
 		log.Error("Error closing discord api session: %v", err)

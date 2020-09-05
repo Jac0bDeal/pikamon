@@ -5,37 +5,41 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/cache"
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/constants"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/store"
 	"github.com/bwmarrin/discordgo"
-	"github.com/dgraph-io/ristretto"
 	log "github.com/sirupsen/logrus"
 )
 
 type pokemonSpawner struct {
 	chance               float64
-	channelCache         *ristretto.Cache
+	cache                *cache.Cache
 	maximumSpawnDuration time.Duration
 	maxPokemonID         int
+	store                store.Store
 }
 
 func newPokemonSpawner(
-	channelCache *ristretto.Cache,
+	c *cache.Cache,
+	s store.Store,
 	chance float64,
 	maximumSpawnDuration time.Duration,
 	maxPokemonID int,
 ) *pokemonSpawner {
 	return &pokemonSpawner{
 		chance:               chance,
-		channelCache:         channelCache,
+		cache:                c,
 		maximumSpawnDuration: maximumSpawnDuration,
 		maxPokemonID:         maxPokemonID,
+		store:                s,
 	}
 }
 
 func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate) bool {
 	// check if channel id is still in cache, if it is
 	// we are still in the debounce window
-	_, exists := p.channelCache.Get(m.ChannelID)
+	_, exists := p.cache.Channel.Get(m.ChannelID)
 	if exists {
 		return false
 	}
@@ -62,7 +66,7 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 
 	// add channel id to cache, set to expire after the debounce window
 	log.Debugf("Adding pokemon with id %d to channel cache", pokemonID)
-	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.maximumSpawnDuration)
+	p.cache.Channel.SetWithTTL(m.ChannelID, pokemonID, 1, p.maximumSpawnDuration)
 
 	return true
 }

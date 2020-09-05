@@ -64,7 +64,7 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	defer h.catchMtx.Unlock()
 
 	// check if channel id is still in cache. If it is not then there is nothing to catch
-	p, exists := h.channelCache.Get(m.ChannelID)
+	p, exists := h.cache.Channel.Get(m.ChannelID)
 	if !exists {
 		err := publishExpiredPokemon(s, m)
 		if err != nil {
@@ -117,7 +117,7 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		log.Debug("Removing channel cache")
-		h.channelCache.Del(m.ChannelID)
+		h.cache.Channel.Del(m.ChannelID)
 	} else {
 		// TODO: block same user from trying to immediately re-catch.
 

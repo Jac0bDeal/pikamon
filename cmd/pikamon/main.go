@@ -6,6 +6,7 @@ import (
 
 	"github.com/Jac0bDeal/pikamon/internal/logging"
 	"github.com/Jac0bDeal/pikamon/internal/pikamon"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/config"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -16,7 +17,7 @@ func init() {
 }
 
 func main() {
-	cfg, err := pikamon.GetConfig()
+	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Fatal("Error getting Pikamon config: ", err)
 	}

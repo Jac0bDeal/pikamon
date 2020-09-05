@@ -4,9 +4,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/cache"
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
+	"github.com/Jac0bDeal/pikamon/internal/pikamon/store"
 	"github.com/bwmarrin/discordgo"
-	"github.com/dgraph-io/ristretto"
 )
 
 type spawner interface {
@@ -21,12 +22,13 @@ type Handler struct {
 
 // NewHandler constructs and returns a new Handler that spawns things in channels.
 func NewHandler(
-	channelCache *ristretto.Cache,
+	c *cache.Cache,
+	s store.Store,
 	pokemonSpawnChance float64,
 	maximumSpawnDuration time.Duration,
 	maxPokemonID int,
 ) *Handler {
-	pokemonSpawner := newPokemonSpawner(channelCache, pokemonSpawnChance, maximumSpawnDuration, maxPokemonID)
+	pokemonSpawner := newPokemonSpawner(c, s, pokemonSpawnChance, maximumSpawnDuration, maxPokemonID)
 
 	return &Handler{
 		spawners: []spawner{

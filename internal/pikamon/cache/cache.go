@@ -33,5 +33,7 @@ func New(cfg *config.Config) (*Cache, error) {
 
 // Close closes all of the caches contained in Cache
 func (c *Cache) Close() {
+	log.Info("Closing cache...")
 	c.Channel.Close()
+	log.Info("Cache closed.")
 }

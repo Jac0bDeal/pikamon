@@ -50,13 +50,16 @@ func New(cfg *config.Config) (*Bot, error) {
 
 	log.Info("Registering bot handlers...")
 	log.Debug("Registering commands handler...")
-	commandsHandler := commands.NewHandler(botCache.Channel)
+	commandsHandler := commands.NewHandler(
+		botCache,
+		botStore,
+	)
 	discord.AddHandler(commandsHandler.Handle)
 	log.Debug("Commands handler registered.")
-
 	log.Debug("Registering spawn handler...")
 	spawnHandler := spawn.NewHandler(
-		botCache.Channel,
+		botCache,
+		botStore,
 		cfg.Bot.SpawnChance,
 		cfg.Bot.MaximumSpawnDuration,
 		cfg.Bot.MaxPokemonID,
@@ -105,10 +108,12 @@ func (b *Bot) Start() error {
 // Stop gracefully shuts down the bot.
 func (b *Bot) Stop() {
 	log.Info("Stopping bot...")
+	log.Info("Closing connection to Discord...")
 	err := b.discord.Close()
 	if err != nil {
 		log.Error("Error closing discord api session: %v", err)
 	}
+	log.Info("Connection to Discord closed...")
 
 	b.cache.Close()
 

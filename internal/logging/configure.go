@@ -13,9 +13,11 @@ func Configure(level string) error {
 		return err
 	}
 	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp: true,
+		ForceColors:     true,
+		FullTimestamp:   true,
+		TimestampFormat: "2006-01-02 15:04:05",
+		PadLevelText:    true,
 	})
-	log.SetReportCaller(true)
 	log.SetOutput(os.Stdout)
 	log.SetLevel(logLevel)
 

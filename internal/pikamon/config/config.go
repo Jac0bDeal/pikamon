@@ -1,4 +1,4 @@
-package pikamon
+package config
 
 import (
 	"time"
@@ -10,22 +10,29 @@ import (
 
 // Config contains the various values that are configurable for the bot.
 type Config struct {
+	Bot struct {
+		MaximumSpawnDuration time.Duration
+		SpawnChance          float64
+		MaxPokemonID         int
+	}
+	Cache struct {
+		Channel struct {
+			NumCounters int64
+			MaxCost     int64
+			BufferItems int64
+		}
+	}
 	Discord struct {
 		Token string
 	}
 	Logging struct {
 		Level string
 	}
-	Bot struct {
-		MaximumSpawnDuration time.Duration
-		SpawnChance          float64
-		MaxPokemonID         int
-	}
-
-	ChannelCache struct {
-		NumCounters int64
-		MaxCost     int64
-		BufferItems int64
+	Store struct {
+		Type   string
+		Sqlite struct {
+			Location string
+		}
 	}
 }
 
@@ -45,13 +52,19 @@ func GetConfig() (*Config, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read config file")
 	}
-	cfg.Logging.Level = viper.GetString("pikamon.logging.level")
+
 	cfg.Bot.MaximumSpawnDuration = viper.GetDuration("pikamon.bot.maximum-spawn-duration")
 	cfg.Bot.SpawnChance = viper.GetFloat64("pikamon.bot.spawn-chance")
 	cfg.Bot.MaxPokemonID = viper.GetInt("pikamon.bot.max-pokemon-id")
-	cfg.ChannelCache.NumCounters = viper.GetInt64("pikamon.channel-cache.number-counters")
-	cfg.ChannelCache.MaxCost = viper.GetInt64("pikamon.channel-cache.max-cost")
-	cfg.ChannelCache.BufferItems = viper.GetInt64("pikamon.channel-cache.buffer-size")
+
+	cfg.Cache.Channel.NumCounters = viper.GetInt64("pikamon.cache.channel.number-counters")
+	cfg.Cache.Channel.MaxCost = viper.GetInt64("pikamon.cache.channel.max-cost")
+	cfg.Cache.Channel.BufferItems = viper.GetInt64("pikamon.cache.channel.buffer-size")
+
+	cfg.Logging.Level = viper.GetString("pikamon.logging.level")
+
+	cfg.Store.Type = viper.GetString("pikamon.store.type")
+	cfg.Store.Sqlite.Location = viper.GetString("pikamon.store.sqlite.location")
 
 	// define flags
 	pflag.StringVarP(&cfg.Discord.Token, "token", "t", "", "Bot Token")

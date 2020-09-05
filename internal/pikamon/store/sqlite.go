@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/config"
+	log "github.com/sirupsen/logrus"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
@@ -21,18 +22,25 @@ func newSqlite(cfg *config.Config) (*Sqlite, error) {
 }
 
 func (s *Sqlite) Close() error {
-	// db already closed, nothing to do
+	log.Info("Closing sqlite db...")
 	if s.db == nil {
+		log.Info("DB already closed, nothing to do.")
 		return nil
 	}
-	return s.db.Close()
+	if err := s.db.Close(); err != nil {
+		return err
+	}
+	log.Info("Closed sqlite db.")
+	return nil
 }
 
 func (s *Sqlite) Open() error {
+	log.Infof("Opening sqlite db at '%s'...", s.location)
 	db, err := sql.Open("sqlite3", s.location)
 	if err != nil {
 		return errors.Wrapf(err, "failed to open sqlite db at '%s'", s.location)
 	}
 	s.db = db
+	log.Info("Opened sqlite db.")
 	return nil
 }

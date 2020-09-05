@@ -7,7 +7,6 @@ import (
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/commands"
 	"github.com/bwmarrin/discordgo"
 	"github.com/dgraph-io/ristretto"
-	"github.com/pkg/errors"
 )
 
 type spawner interface {
@@ -26,17 +25,14 @@ func NewHandler(
 	pokemonSpawnChance float64,
 	maximumSpawnDuration time.Duration,
 	maxPokemonID int,
-) (*Handler, error) {
-	pokemonSpawner, err := newPokemonSpawner(channelCache, pokemonSpawnChance, maximumSpawnDuration, maxPokemonID)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to build pokemon spawner")
-	}
+) *Handler {
+	pokemonSpawner := newPokemonSpawner(channelCache, pokemonSpawnChance, maximumSpawnDuration, maxPokemonID)
 
 	return &Handler{
 		spawners: []spawner{
 			pokemonSpawner,
 		},
-	}, nil
+	}
 }
 
 // Handle is the handler function registered on the discord bot that

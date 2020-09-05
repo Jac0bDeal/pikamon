@@ -85,7 +85,7 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	text := strings.TrimSpace(strings.ToLower(m.Content))
 	commandText := strings.TrimSpace(text[len(CommandKeyword):])
 	commands := strings.Fields(commandText)[1:]
-	log.Infof("Command String: %v\n", commands)
+	log.Tracef("Command String: %v\n", commands)
 
 	// Get the pokemon name specified by the person trying to catch it and handle the case where no name was passed
 	if len(commands) == 0 {
@@ -119,7 +119,7 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 		log.Debug("Removing channel cache")
 		h.channelCache.Del(m.ChannelID)
 	} else {
-		log.Info("TODO - block the same user from retrying catch")
+		// TODO: block same user from trying to immediately re-catch.
 
 		err := publichCatchFailure(s, m)
 		if err != nil {

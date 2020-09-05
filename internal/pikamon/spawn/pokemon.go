@@ -23,13 +23,13 @@ func newPokemonSpawner(
 	chance float64,
 	maximumSpawnDuration time.Duration,
 	maxPokemonID int,
-) (*pokemonSpawner, error) {
+) *pokemonSpawner {
 	return &pokemonSpawner{
 		chance:               chance,
 		channelCache:         channelCache,
 		maximumSpawnDuration: maximumSpawnDuration,
 		maxPokemonID:         maxPokemonID,
-	}, nil
+	}
 }
 
 func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate) bool {
@@ -61,7 +61,7 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 	}
 
 	// add channel id to cache, set to expire after the debounce window
-	log.Infof("Adding pokemon with id %d to channel cache", pokemonID)
+	log.Debugf("Adding pokemon with id %d to channel cache", pokemonID)
 	p.channelCache.SetWithTTL(m.ChannelID, pokemonID, 1, p.maximumSpawnDuration)
 
 	return true

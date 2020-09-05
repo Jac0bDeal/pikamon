@@ -13,4 +13,4 @@ pikamon:
   store:
     type: sqlite
     sqlite:
-      location: data/sqlite/pikamon.db
+      location: ./data/sqlite/pikamon.db

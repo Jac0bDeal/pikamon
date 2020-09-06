@@ -1,8 +1,8 @@
 pikamon:
   bot:
     maximum-spawn-duration: 300s
-    spawn-chance: 1.00
-    max-pokemon-id: 1
+    spawn-chance: 0.08
+    max-pokemon-id: 807
   cache:
     channel:
       number-counters: 100

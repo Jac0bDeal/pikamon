@@ -9,8 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (h *Handler) pokemon(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// check if trainer attempting catch is registered, and return register suggestion if not
+func (h *Handler) list(s *discordgo.Session, m *discordgo.MessageCreate) {
+	// check if trainer is registered, and return register suggestion if not
 	registered, trainerID, err := h.isRegistered(m.Author.ID)
 	if err != nil {
 		log.WithField("trainer", m.Author.ID).Error("Error checking if trainer is registered")
@@ -22,7 +22,7 @@ func (h *Handler) pokemon(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	pokemon, err := h.store.GetAllPokemon(trainerID)
 	if err != nil {
-		log.WithField("trainer", trainerID).Errorf("Failed to get all pokemon for trainer: %v", err)
+		log.WithField("trainer", trainerID).Errorf("Failed to get all list for trainer: %v", err)
 	}
 
 	publishPokemonInfo(pokemon, s, m)

@@ -15,7 +15,7 @@ const (
 	CommandKeyword = "p!ka"
 
 	catchCommand    = "catch"
-	pokemonCommand  = "pokemon"
+	listCommand     = "list"
 	registerCommand = "register"
 	helpCommand     = "help"
 )
@@ -69,8 +69,8 @@ func (h *Handler) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	switch command {
 	case catchCommand:
 		handle = h.catch
-	case pokemonCommand:
-		handle = h.pokemon
+	case listCommand:
+		handle = h.list
 	case helpCommand:
 		handle = h.help
 	case registerCommand:

@@ -48,7 +48,7 @@ func publishSuccessfulCatch(s *discordgo.Session, m *discordgo.MessageCreate, po
 }
 
 func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// lock a mutex here so that multiple people can't catch the pokemon at the same time.
+	// lock a mutex here so that multiple people can't catch the list at the same time.
 	h.catchMtx.Lock()
 	defer h.catchMtx.Unlock()
 
@@ -73,7 +73,7 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// Create pokemon information object from the cache
+	// Create list information object from the cache
 	var pokemonId = p.(int)
 	pInfo, err := pokeapi.Pokemon(strconv.Itoa(pokemonId))
 	if err != nil {
@@ -87,7 +87,7 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	commands := strings.Fields(commandText)[1:]
 	log.Tracef("Command String: %v\n", commands)
 
-	// Get the pokemon name specified by the person trying to catch it and handle the case where no name was passed
+	// Get the list name specified by the person trying to catch it and handle the case where no name was passed
 	if len(commands) == 0 {
 		err := publichCatchFailure(s, m)
 		if err != nil {
@@ -98,9 +98,9 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	pokemonName := strings.ToLower(commands[0])
 
 	log.WithFields(log.Fields{
-		"pokemon": pokemonName,
+		"list":    pokemonName,
 		"trainer": trainerID,
-	}).Debug("Trying to catch a pokemon!")
+	}).Debug("Trying to catch a list!")
 
 	// Perform catch attempt
 	expectedPokemonName := pInfo.Name
@@ -114,9 +114,9 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		if err := h.store.CreatePokemon(pokemon); err != nil {
 			log.WithFields(log.Fields{
-				"pokemon": pokemonName,
+				"list":    pokemonName,
 				"trainer": trainerID,
-			}).Error("Failed to create new pokemon in store.")
+			}).Error("Failed to create new list in store.")
 			return
 		}
 		err = publishSuccessfulCatch(s, m, expectedPokemonName)

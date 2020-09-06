@@ -2,10 +2,10 @@ package cache
 
 import (
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/config"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/dgraph-io/ristretto"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 // Cache holds the various caches for the Bot.

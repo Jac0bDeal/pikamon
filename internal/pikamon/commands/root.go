@@ -14,8 +14,10 @@ import (
 const (
 	CommandKeyword = "p!ka"
 
-	catchCommand = "catch"
-	helpCommand  = "help"
+	catchCommand    = "catch"
+	pokemonCommand  = "pokemon"
+	registerCommand = "register"
+	helpCommand     = "help"
 )
 
 type handler func(*discordgo.Session, *discordgo.MessageCreate)
@@ -67,8 +69,12 @@ func (h *Handler) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	switch command {
 	case catchCommand:
 		handle = h.catch
+	case pokemonCommand:
+		handle = h.pokemon
 	case helpCommand:
 		handle = h.help
+	case registerCommand:
+		handle = h.register
 	default:
 		log.Debugf("Received unrecognized command: %s", commandText)
 		handle = h.help

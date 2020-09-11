@@ -23,15 +23,26 @@ the `--token` or `-t` flag:
 ./bin/pikamon --token <TOKEN_HERE>
 ./bin/pikamon -t <TOKEN_HERE>
 ```
-Alternatively, if the token is exported via the appropriate env variable, 
-the `--token` flag is not needed:
-```shell script
-export PIKAMON_TOKEN=<TOKEN_HERE>
-./bin/pikamon
-```
+
 To acquire the dev bot token, reach out to a project admin. If a standalone bot
 is desired (i.e. a completely separate instance), then 
 follow the [Discord API Docs](https://discord.com/developers/docs/intro).
+
+## Docker
+A Docker image containing the bot and migration utility can be built using
+```shell script
+make docker-image
+```
+
+To run the image, pass the token in via the `PIKAMON_TOKEN` environment variable:
+```shell script
+docker run -e PIKAMON_TOKEN=<TOKEN_HERE> pikamon
+```
+
+To make the store persistent, just mount `/pikamon/data` to an external volume:
+```shell script
+docker run -e PIKAMON_TOKEN=<TOKEN_HERE> -v data:/pikamon/data pikamon
+```
 
 ## Configuration
 Pikamon requires a config file named `pikamon.yml` in either `/etc/pikamon` or `./configs`.

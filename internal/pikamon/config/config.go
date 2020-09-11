@@ -41,7 +41,7 @@ func GetConfig() (*Config, error) {
 	cfg := &Config{}
 
 	// initialize config variables
-	viper.SetEnvPrefix("pikamon")
+	viper.SetEnvPrefix("PIKAMON")
 	viper.SetConfigName("pikamon")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("/etc/pikamon")

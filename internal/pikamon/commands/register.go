@@ -42,7 +42,7 @@ func (h *Handler) register(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	log.WithFields(log.Fields{"id": trainerID}).Debugf("Checking if trainer is already registered...")
-	registered, trainerID, err := h.isRegistered(m.Author.ID)
+	registered, _, err := h.isRegistered(m.Author.ID)
 	if err != nil {
 		log.WithField("trainer", m.Author.ID).Error("Error checking if trainer is registered")
 	}

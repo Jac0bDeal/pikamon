@@ -12,6 +12,7 @@ import (
 
 func (h *Handler) isRegistered(authorID string) (bool, int, error) {
 	trainerID, err := strconv.Atoi(authorID)
+	log.Info(trainerID)
 	if err != nil {
 		return false, 0, errors.Wrapf(err, "received unparsable integer %s", authorID)
 	}

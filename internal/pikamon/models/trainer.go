@@ -1,5 +1,5 @@
 package models
 
 type Trainer struct {
-	ID int
+	ID string
 }

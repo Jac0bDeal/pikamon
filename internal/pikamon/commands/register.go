@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/constants"
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/models"
@@ -35,16 +34,13 @@ func publishTrainerWelcome(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func (h *Handler) register(s *discordgo.Session, m *discordgo.MessageCreate) {
-	log.WithFields(log.Fields{"id": m.Author.ID}).Debug("Received init trainer command")
-	trainerID, err := strconv.Atoi(m.Author.ID)
-	if err != nil {
-		log.Errorf("Received unparsable integer %s: %v", m.Author.ID, err)
-	}
+	trainerID := m.Author.ID
+	log.WithFields(log.Fields{"id": trainerID}).Debug("Received init trainer command")
 
 	log.WithFields(log.Fields{"id": trainerID}).Debugf("Checking if trainer is already registered...")
-	registered, _, err := h.isRegistered(m.Author.ID)
+	registered, err := h.isRegistered(trainerID)
 	if err != nil {
-		log.WithField("trainer", m.Author.ID).Error("Error checking if trainer is registered")
+		log.WithField("trainer", trainerID).Error("Error checking if trainer is registered")
 	}
 	if registered {
 		publishTrainerAlreadyRegistered(s, m)

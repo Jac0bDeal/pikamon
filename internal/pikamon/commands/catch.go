@@ -64,7 +64,8 @@ func (h *Handler) catch(s *discordgo.Session, m *discordgo.MessageCreate) {
 	log.Debug("Pokemon cache still exists, attempting catch...")
 
 	// check if trainer attempting catch is registered, and return register suggestion if not
-	registered, trainerID, err := h.isRegistered(m.Author.ID)
+	trainerID := m.Author.ID
+	registered, err := h.isRegistered(trainerID)
 	if err != nil {
 		log.WithField("trainer", m.Author.ID).Error("Error checking if trainer is registered")
 	}

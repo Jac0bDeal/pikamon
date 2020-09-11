@@ -10,10 +10,11 @@ import (
 )
 
 func (h *Handler) list(s *discordgo.Session, m *discordgo.MessageCreate) {
+	trainerID := m.Author.ID
 	// check if trainer is registered, and return register suggestion if not
-	registered, trainerID, err := h.isRegistered(m.Author.ID)
+	registered, err := h.isRegistered(trainerID)
 	if err != nil {
-		log.WithField("trainer", m.Author.ID).Error("Error checking if trainer is registered")
+		log.WithField("trainer", trainerID).Error("Error checking if trainer is registered")
 	}
 	if !registered {
 		publishTrainerNotRegistered(s, m)

@@ -87,7 +87,7 @@ func (s *Sqlite) CreateTrainer(trainer *models.Trainer) error {
 }
 
 // GetAllPokemon returns all of the pokemon currently assigned to a trainer.
-func (s *Sqlite) GetAllPokemon(trainerID int) ([]*models.Pokemon, error) {
+func (s *Sqlite) GetAllPokemon(trainerID string) ([]*models.Pokemon, error) {
 	stmt, err := s.db.Prepare(
 		"SELECT id, pokemon_id, name FROM pokemon WHERE trainer = ?",
 	)
@@ -117,7 +117,7 @@ func (s *Sqlite) GetAllPokemon(trainerID int) ([]*models.Pokemon, error) {
 }
 
 // GetTrainer returns the information associated with a trainer.
-func (s *Sqlite) GetTrainer(trainerID int) (*models.Trainer, error) {
+func (s *Sqlite) GetTrainer(trainerID string) (*models.Trainer, error) {
 	stmt, err := s.db.Prepare(
 		"SELECT id FROM trainers WHERE id = ?",
 	)

@@ -3,12 +3,12 @@ package models
 import "fmt"
 
 type Pokemon struct {
-	ID        int
+	ID        string
 	PokemonID int
-	TrainerID int
+	TrainerID string
 	Name      string
 }
 
 func (p *Pokemon) ListingInfo() string {
-	return fmt.Sprintf("**%s** | ID: %d", p.Name, p.ID)
+	return fmt.Sprintf("**%s** | ID: %s", p.Name, p.ID)
 }

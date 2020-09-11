@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/Jac0bDeal/pikamon/internal/pikamon/constants"
 	"github.com/bwmarrin/discordgo"
@@ -10,20 +9,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (h *Handler) isRegistered(authorID string) (bool, int, error) {
-	trainerID, err := strconv.Atoi(authorID)
-	log.Info(trainerID)
-	if err != nil {
-		return false, 0, errors.Wrapf(err, "received unparsable integer %s", authorID)
-	}
+func (h *Handler) isRegistered(trainerID string) (bool, error) {
 	registeredTrainer, err := h.store.GetTrainer(trainerID)
 	if err != nil {
-		return false, 0, errors.Wrap(err, "unable to fetch trainer from store")
+		return false, errors.Wrap(err, "unable to fetch trainer from store")
 	}
 	if registeredTrainer == nil {
-		return false, 0, nil
+		return false, nil
 	}
-	return true, trainerID, nil
+	return true, nil
 }
 
 func publishTrainerNotRegistered(s *discordgo.Session, m *discordgo.MessageCreate) {

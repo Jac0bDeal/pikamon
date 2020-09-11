@@ -18,8 +18,8 @@ type Store interface {
 
 	CreatePokemon(pokemon *models.Pokemon) error
 	CreateTrainer(trainer *models.Trainer) error
-	GetAllPokemon(trainer int) ([]*models.Pokemon, error)
-	GetTrainer(trainer int) (*models.Trainer, error)
+	GetAllPokemon(trainer string) ([]*models.Pokemon, error)
+	GetTrainer(trainer string) (*models.Trainer, error)
 }
 
 // New builds and returns an implementation of Store based on the passed config.

@@ -56,7 +56,7 @@ func (p *pokemonSpawner) spawn(s *discordgo.Session, m *discordgo.MessageCreate)
 		Description: "Guess the pokémon аnd type `p!ka catch <pokémon>` to cаtch it!",
 		Color:       constants.MessageColor,
 		Image: &discordgo.MessageEmbedImage{
-			URL: fmt.Sprintf("https://pokeres.bastionbot.org/images/pokemon/%d.png", pokemonID),
+			URL: fmt.Sprintf("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/%d.png", pokemonID),
 		},
 	}
 	if _, err := s.ChannelMessageSendEmbed(m.ChannelID, &msg); err != nil {

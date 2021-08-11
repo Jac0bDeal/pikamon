@@ -1,14 +1,15 @@
 pikamon:
-  logging:
-    level: debug
   bot:
     maximum-spawn-duration: 600s
     spawn-chance: 0.08
     max-pokemon-id: 807
-  channel-cache:
-    number-counters: 100
-    max-cost: 100
-    buffer-size: 64
+  cache:
+    channel:
+      number-counters: 100
+      max-cost: 100
+      buffer-size: 64
+  logging:
+    level: debug
   store:
     type: sqlite
     sqlite:

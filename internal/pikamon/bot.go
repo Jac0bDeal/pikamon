@@ -111,7 +111,7 @@ func (b *Bot) Stop() {
 	log.Info("Closing connection to Discord...")
 	err := b.discord.Close()
 	if err != nil {
-		log.Error("Error closing discord api session: %v", err)
+		log.Fatal("failed to create channel cache:", err)
 	}
 	log.Info("Connection to Discord closed...")
 
